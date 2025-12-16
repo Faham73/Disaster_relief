@@ -2,10 +2,11 @@
 include 'header.php';
 include 'config.php';
 
-if (session_status() === PHP_SESSION_NONE) session_start();
-if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
+// if ($_SESSION['user']['role'] !== 'volunteer') {
+//     header("Location: dashboard.php");
+//     exit();
+// }
 
-$msg = ""; $err = "";
 
 $volunteers = $conn->query("SELECT id, name, email FROM users WHERE role='volunteer' ORDER BY name");
 $disasters = $conn->query("SELECT id, name, location FROM disasters ORDER BY date DESC");
@@ -42,9 +43,7 @@ if (isset($_POST['assign'])) {
         <h5 class="mb-0">Assign Volunteer</h5>
       </div>
       <div class="card-body">
-        <?php if ($msg): ?><div class="alert alert-success"><?= htmlspecialchars($msg) ?></div><?php endif; ?>
-        <?php if ($err): ?><div class="alert alert-danger"><?= htmlspecialchars($err) ?></div><?php endif; ?>
-
+        
         <form method="post">
           <div class="mb-2">
             <label class="form-label">Volunteer</label>

@@ -2,10 +2,32 @@
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-?>
 
+/*
+|--------------------------------------------------------------------------
+| SAFE SESSION HANDLING
+|--------------------------------------------------------------------------
+*/
+$user = $_SESSION['user'] ?? null;
+$role = $user['role'] ?? null;
+$name = $user['name'] ?? null;
+
+/*
+|--------------------------------------------------------------------------
+| OPTIONAL: Redirect guests (disable for login/register pages)
+|--------------------------------------------------------------------------
+*/
+$current_page = basename($_SERVER['PHP_SELF']);
+$public_pages = ['login.php', 'register.php'];
+
+if (!$user && !in_array($current_page, $public_pages)) {
+    header("Location: login.php");
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Disaster Relief Resource Management</title>
@@ -40,7 +62,7 @@ if (session_status() === PHP_SESSION_NONE) {
         /* FIXED SIDEBAR */
         .sidebar {
             position: fixed;
-            top: var(--navbar-height);  /* FIXED OVERLAPPING */
+            top: var(--navbar-height);
             left: 0;
             width: var(--sidebar-width);
             height: calc(100vh - var(--navbar-height));
@@ -67,12 +89,7 @@ if (session_status() === PHP_SESSION_NONE) {
         .content {
             margin-left: var(--sidebar-width);
             padding: 30px;
-            margin-top: var(--navbar-height); /* FIXED OVERLAPPING */
-        }
-
-        .page-title {
-            font-weight: 600;
-            font-size: 22px;
+            margin-top: var(--navbar-height);
         }
     </style>
 </head>
@@ -81,56 +98,65 @@ if (session_status() === PHP_SESSION_NONE) {
 
 <!-- NAVBAR -->
 <nav class="navbar navbar-dark bg-dark px-3 shadow-sm">
-    <a class="navbar-brand d-flex align-items-center" href="dashboard.php">
+    <a class="navbar-brand d-flex align-items-center"
+       href="<?= $role === 'admin' ? 'dashboard.php' : 'volunteer_dashboard.php'; ?>">
         <i class="bi bi-life-preserver me-2"></i>
-        Disaster Relief Admin
+        Disaster Relief
     </a>
 
     <div class="d-flex align-items-center">
-        <?php if(isset($_SESSION['name'])): ?>
+        <?php if ($name): ?>
             <span class="text-white me-3">
-                <i class="bi bi-person-circle"></i> <?= $_SESSION['name']; ?>
+                <i class="bi bi-person-circle"></i> <?= htmlspecialchars($name); ?>
             </span>
         <?php endif; ?>
 
-        <a href="logout.php" class="btn btn-danger btn-sm">
-            <i class="bi bi-box-arrow-right"></i> Logout
-        </a>
+        <?php if ($user): ?>
+            <a href="logout.php" class="btn btn-danger btn-sm">
+                <i class="bi bi-box-arrow-right"></i> Logout
+            </a>
+        <?php endif; ?>
     </div>
 </nav>
 
+<?php if ($user): ?>
 <!-- SIDEBAR -->
 <div class="sidebar">
 
-    <a href="dashboard.php" class="<?= basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : '' ?>">
+    <!-- COMMON -->
+    <a href="<?= $role === 'admin' ? 'dashboard.php' : 'volunteer_dashboard.php'; ?>">
         <i class="bi bi-speedometer2 me-2"></i> Dashboard
     </a>
 
-    <a href="add_disaster.php" class="<?= basename($_SERVER['PHP_SELF']) == 'add_disaster.php' ? 'active' : '' ?>">
+    <a href="add_disaster.php">
         <i class="bi bi-exclamation-triangle me-2"></i> Add Disaster
     </a>
 
-    <a href="add_resource.php" class="<?= basename($_SERVER['PHP_SELF']) == 'add_resource.php' ? 'active' : '' ?>">
+    <a href="add_resource.php">
         <i class="bi bi-box-seam me-2"></i> Add Resource
     </a>
 
-    <a href="add_victim.php" class="<?= basename($_SERVER['PHP_SELF']) == 'add_victim.php' ? 'active' : '' ?>">
+    <a href="add_victim.php">
         <i class="bi bi-people-fill me-2"></i> Add Victim
     </a>
 
-    <a href="distribute.php" class="<?= basename($_SERVER['PHP_SELF']) == 'distribute.php' ? 'active' : '' ?>">
-        <i class="bi bi-hand-index-thumb me-2"></i> Distribute Resources
-    </a>
+    <!-- ADMIN ONLY -->
+    <?php if ($role === 'admin'): ?>
+        <a href="distribute.php">
+            <i class="bi bi-hand-index-thumb me-2"></i> Distribute Resources
+        </a>
 
-    <a href="view_distribution.php" class="<?= basename($_SERVER['PHP_SELF']) == 'view_distribution.php' ? 'active' : '' ?>">
-        <i class="bi bi-table me-2"></i> View Distribution
-    </a>
+        <a href="view_distribution.php">
+            <i class="bi bi-table me-2"></i> View Distribution
+        </a>
 
-    <a href="volunteer_assign.php" class="<?= basename($_SERVER['PHP_SELF']) == 'volunteer_assign.php' ? 'active' : '' ?>">
-        <i class="bi bi-person-check me-2"></i> Assign Volunteer
-    </a>
+        <a href="volunteer_assign.php">
+            <i class="bi bi-person-check me-2"></i> Assign Volunteer
+        </a>
+    <?php endif; ?>
 
 </div>
+<?php endif; ?>
 
 <!-- PAGE CONTENT -->
 <div class="content">

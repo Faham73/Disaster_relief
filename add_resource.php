@@ -1,9 +1,16 @@
 <?php
+
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+if (!isset($_SESSION['user'])) {
+    header("Location: login.php");
+    exit();
+}
+
 include 'header.php';
 include 'config.php';
-
-if (session_status() === PHP_SESSION_NONE) session_start();
-if (!isset($_SESSION['user'])) { header('Location: login.php'); exit; }
 
 $msg = ""; $err = "";
 if (isset($_POST['submit'])) {

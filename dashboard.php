@@ -140,28 +140,133 @@
 
 <div class="container my-5">
 
-    <section class="py-5 bg-light">
+    <section class="py-5 bg-danger text-white">
         <div class="container text-center">
 
-            <h2 class="fw-bold mb-3">Need Help Now?</h2>
+            <span class="badge bg-warning text-dark px-3 py-2 mb-3 fs-6">
+                Emergency Support Available 24/7
+            </span>
 
-            <p class="lead text-muted mb-4">
-                If you are in immediate need of help, please contact your local disaster relief center
-                or find an open emergency shelter near you.
+            <h2 class="fw-bold mt-3 mb-3">Need Help Now?</h2>
+
+            <p class="lead mb-4">
+                If you are in immediate danger or urgently need assistance, contact our emergency
+                hotline or find the nearest relief shelter immediately.
             </p>
 
+            <!-- Hotline -->
+            <div class="mb-4">
+                <h3 class="fw-bold display-6">
+                    📞 Emergency Hotline:
+                    <a href="tel:999" class="text-white text-decoration-none">
+                        999
+                    </a>
+                </h3>
+                <small class="opacity-75">
+                    (Available 24 hours a day, nationwide)
+                </small>
+            </div>
+
+            <!-- Action Buttons -->
             <div class="d-flex justify-content-center gap-3 flex-wrap">
-                <a href="#" class="btn btn-danger btn-lg px-4 py-2 fw-semibold">
-                    Contact Local Relief Center »
+                <a href="find_shelter.php" class="btn btn-light btn-lg fw-semibold px-4">
+                    Find an Open Shelter »
                 </a>
 
-                <a href="#" class="btn btn-outline-danger btn-lg px-4 py-2 fw-semibold">
-                    Find an Open Shelter »
+                <a href="add_victim.php" class="btn btn-outline-light btn-lg fw-semibold px-4">
+                    Request Emergency Assistance »
                 </a>
             </div>
 
         </div>
     </section>
+
+    <section class="py-5 bg-light">
+    <div class="container">
+
+        <div class="text-center mb-5">
+            <h2 class="fw-bold">Find an Open Shelter Near You</h2>
+            <p class="text-muted">
+                Enter your location to see available emergency shelters.
+            </p>
+        </div>
+
+        <!-- Search Form -->
+        <form method="GET" class="row justify-content-center mb-4">
+            <div class="col-md-6">
+                <input type="text" name="location" class="form-control form-control-lg"
+                       placeholder="Enter your city or area (e.g. Dhaka)"
+                       value="<?php echo $_GET['location'] ?? ''; ?>" required>
+            </div>
+            <div class="col-md-2 d-grid">
+                <button class="btn btn-danger btn-lg">
+                    🔍 Search
+                </button>
+            </div>
+        </form>
+
+        <!-- Results -->
+        <div class="row">
+            <?php
+            include 'config.php';
+
+            if (isset($_GET['location'])) {
+                $location = mysqli_real_escape_string($conn, $_GET['location']);
+
+                $query = "
+                    SELECT * FROM shelters
+                    WHERE location LIKE '%$location%'
+                    AND available_slots > 0
+                ";
+
+                $result = mysqli_query($conn, $query);
+
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+            ?>
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold">
+                                        <?php echo $row['name']; ?>
+                                    </h5>
+                                    <p class="mb-1">
+                                        📍 <?php echo $row['location']; ?>
+                                    </p>
+                                    <p class="mb-1">
+                                        🏠 Capacity: <?php echo $row['capacity']; ?>
+                                    </p>
+                                    <p class="mb-3 text-success fw-semibold">
+                                        ✅ Available Slots: <?php echo $row['available_slots']; ?>
+                                    </p>
+                                    <p class="mb-2">
+                                        📞 <?php echo $row['contact']; ?>
+                                    </p>
+
+                                    <a href="tel:<?php echo $row['contact']; ?>"
+                                       class="btn btn-outline-danger w-100">
+                                        Call Shelter
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+            <?php
+                    }
+                } else {
+                    echo "
+                        <div class='text-center text-muted'>
+                            <h5>No shelters available in this location right now.</h5>
+                        </div>
+                    ";
+                }
+            }
+            ?>
+        </div>
+
+    </div>
+</section>
+
+
 
 
     <!-- Quick Stats -->
@@ -208,7 +313,7 @@
         </div>
 
         <div class="col-md-3">
-            <a href="volenteer_assign.php" class="btn btn-outline-danger w-100 p-3">
+            <a href="volunteer_assign.php" class="btn btn-outline-danger w-100 p-3">
                 Assign Volunteers
             </a>
         </div>
@@ -228,15 +333,15 @@
     </div>
 
     <!-- About Section -->
-    <h3 class="section-title mt-5">About Disaster Response</h3>
+    <!-- <h3 class="section-title mt-5">About Disaster Response</h3>
     <p class="lead">
         Our mission is simple: bring urgent relief to individuals, families, and communities
         affected by disasters — big or small. We provide safe shelter, clean water, hot meals,
         emergency supplies, medical aid, and emotional support.
-    </p>
+    </p> -->
 
     <!-- Donate Box -->
-    <div class="donate-box mt-5 shadow-sm">
+    <!-- <div class="donate-box mt-5 shadow-sm">
         <h3>Support Disaster Relief Efforts</h3>
         <p class="text-muted">Your support helps deliver care and comfort to those in need.</p>
 
@@ -248,7 +353,7 @@
         </div>
 
         <button class="donate-btn mt-3 px-5">Donate Now</button>
-    </div>
+    </div> -->
 
 </div>
 

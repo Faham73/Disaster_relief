@@ -1,76 +1,109 @@
 <?php
 include 'config.php';
+include 'header.php';
 
 $message = "";
 
 if (isset($_POST['register'])) {
-    $name = mysqli_real_escape_string($conn, $_POST['name']);
+
+    $name  = mysqli_real_escape_string($conn, $_POST['name']);
     $email = mysqli_real_escape_string($conn, $_POST['email']);
     $password = password_hash($_POST['password'], PASSWORD_DEFAULT);
     $role = $_POST['role'];
 
-    // Check if email already exists
     $check = mysqli_query($conn, "SELECT * FROM users WHERE email='$email'");
 
     if (mysqli_num_rows($check) > 0) {
-        $message = "<div class='alert alert-danger'>Email already exists!</div>";
+        $message = "<div class='alert alert-danger text-center'>Email already exists!</div>";
     } else {
-        $query = "INSERT INTO users(name,email,password,role)
-                  VALUES ('$name','$email','$password','$role')";
+
+        $query = "INSERT INTO users (name, email, password, role)
+                  VALUES ('$name', '$email', '$password', '$role')";
 
         if (mysqli_query($conn, $query)) {
-            $message = "<div class='alert alert-success'>Registration successful! Redirecting to login...</div>";
+            $message = "<div class='alert alert-success text-center'>
+                        Registration successful! Redirecting to login...
+                        </div>";
             echo "<meta http-equiv='refresh' content='2;url=login.php'>";
         } else {
-            $message = "<div class='alert alert-danger'>Error: Could not register.</div>";
+            $message = "<div class='alert alert-danger text-center'>Registration failed!</div>";
         }
     }
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Register</title>
-    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
-</head>
-<body class="bg-light">
+<style>
+    body {
+        background: linear-gradient(135deg, #dc3545, #842029);
+        min-height: 100vh;
+    }
+    .register-card {
+        border-radius: 16px;
+        box-shadow: 0 20px 40px rgba(0,0,0,.2);
+    }
+</style>
 
-<div class="container mt-5 w-50">
-    <h3 class="text-center mb-4">User Registration</h3>
+<div class="container d-flex align-items-center justify-content-center" style="min-height: 90vh;">
+    <div class="col-md-5">
 
-    <?php echo $message; ?>
+        <div class="card register-card p-4">
 
-    <div class="card p-4 shadow">
-        <form method="POST">
+            <h4 class="text-center fw-bold mb-2">
+                Disaster Relief Registration
+            </h4>
 
-            <label>Name:</label>
-            <input type="text" name="name" class="form-control mb-3" required>
+            <p class="text-center text-muted mb-4">
+                Create an account to support relief operations
+            </p>
 
-            <label>Email:</label>
-            <input type="email" name="email" class="form-control mb-3" required>
+            <?php echo $message; ?>
 
-            <label>Password:</label>
-            <input type="password" name="password" class="form-control mb-3" required>
+            <form method="POST">
 
-            <label>Role:</label>
-            <select name="role" class="form-control mb-3">
-                <option value="admin">Admin</option>
-                <option value="volunteer">Volunteer</option>
-            </select>
+                <div class="mb-3">
+                    <input type="text" name="name"
+                           class="form-control form-control-lg"
+                           placeholder="👤 Full Name"
+                           required>
+                </div>
 
-            <button type="submit" name="register" class="btn btn-primary w-100">
-                Register
-            </button>
+                <div class="mb-3">
+                    <input type="email" name="email"
+                           class="form-control form-control-lg"
+                           placeholder="📧 Email Address"
+                           required>
+                </div>
 
-        </form>
+                <div class="mb-3">
+                    <input type="password" name="password"
+                           class="form-control form-control-lg"
+                           placeholder="🔒 Password"
+                           required>
+                </div>
 
-        <p class="text-center mt-3">
-            Already have an account?
-            <a href="login.php">Login</a>
-        </p>
+                <div class="mb-4">
+                    <select name="role" class="form-select form-select-lg" required>
+                        <option value="">Select Role</option>
+                        <option value="volunteer">Volunteer</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+
+                <button type="submit" name="register"
+                        class="btn btn-danger btn-lg w-100 fw-semibold">
+                    Register
+                </button>
+            </form>
+
+            <div class="text-center mt-4">
+                Already have an account?
+                <a href="login.php" class="fw-semibold text-danger text-decoration-none">
+                    Login
+                </a>
+            </div>
+
+        </div>
     </div>
 </div>
 
-</body>
-</html>
+<?php include 'footer.php'; ?>
